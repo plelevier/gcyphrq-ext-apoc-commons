@@ -233,7 +233,7 @@ Uses the [`ecommerce.json`](examples/ecommerce.json) graph to parse ISO timestam
 gcyphrq -g examples/ecommerce.json --ext-fn apoc-commons \
   -e '
     MATCH (o:Order)-[:CONTAINS]->(p:Product)
-    RETURN o.id AS orderId,
+    RETURN o.orderId AS orderId,
            apoc.date.format(apoc.date.parse(o.date), "yyyy-MM-dd") AS orderDate,
            p.name AS product,
            apoc.math.clamp(p.stock, 0, 100) AS stockLevel

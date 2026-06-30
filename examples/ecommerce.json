@@ -10,11 +10,11 @@
     { "key": "prod-4", "attributes": { "label": "Product", "name": "USB-C Hub", "category": "Electronics", "price": 49.99, "stock": 150 } },
     { "key": "prod-5", "attributes": { "label": "Product", "name": "Ergonomic Chair", "category": "Furniture", "price": 399.00, "stock": 25 } },
     { "key": "prod-6", "attributes": { "label": "Product", "name": "Mechanical Keyboard", "category": "Electronics", "price": 149.99, "stock": 80 } },
-    { "key": "order-1", "attributes": { "label": "Order", "id": "ORD-001", "date": "2024-01-15T10:30:00Z", "status": "delivered", "total": 1329.98 } },
-    { "key": "order-2", "attributes": { "label": "Order", "id": "ORD-002", "date": "2024-02-20T14:00:00Z", "status": "delivered", "total": 548.99 } },
-    { "key": "order-3", "attributes": { "label": "Order", "id": "ORD-003", "date": "2024-03-05T09:15:00Z", "status": "shipped", "total": 1449.98 } },
-    { "key": "order-4", "attributes": { "label": "Order", "id": "ORD-004", "date": "2024-03-10T16:45:00Z", "status": "pending", "total": 449.98 } },
-    { "key": "order-5", "attributes": { "label": "Order", "id": "ORD-005", "date": "2024-04-01T11:00:00Z", "status": "delivered", "total": 179.98 } }
+    { "key": "order-1", "attributes": { "label": "Order", "orderId": "ORD-001", "date": "2024-01-15T10:30:00Z", "status": "delivered", "total": 1329.98 } },
+    { "key": "order-2", "attributes": { "label": "Order", "orderId": "ORD-002", "date": "2024-02-20T14:00:00Z", "status": "delivered", "total": 548.99 } },
+    { "key": "order-3", "attributes": { "label": "Order", "orderId": "ORD-003", "date": "2024-03-05T09:15:00Z", "status": "shipped", "total": 1449.98 } },
+    { "key": "order-4", "attributes": { "label": "Order", "orderId": "ORD-004", "date": "2024-03-10T16:45:00Z", "status": "pending", "total": 449.98 } },
+    { "key": "order-5", "attributes": { "label": "Order", "orderId": "ORD-005", "date": "2024-04-01T11:00:00Z", "status": "delivered", "total": 179.98 } }
   ],
   "edges": [
     { "source": "cust-1", "target": "order-1", "attributes": { "type": "PLACED" } },
