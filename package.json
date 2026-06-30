@@ -1,6 +1,6 @@
 {
   "name": "gcyphrq-ext-apoc-commons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Common APOC utility functions for gcyphrq (text, collection, map, math, date)",
   "type": "module",
   "main": "dist/index.js",
