@@ -1,7 +1,7 @@
 import type { FunctionExtension, FunctionRegistry } from 'gcyphrq';
 import { helpers, validate, FunctionError } from 'gcyphrq';
 
-const { isString, isNumber, isBoolean, isArray, isObject, isNil, isDate } = helpers;
+const { isString, isNumber, isBoolean, isArray, isObject, isDate } = helpers;
 
 /**
  * Common APOC utility functions for gcyphrq.
@@ -199,12 +199,10 @@ export default {
       if (sets.length < 2) return [];
       // Count how many sets contain each item (not total occurrences)
       const setCounts = new Map<unknown, number>();
-      const allItems = new Set<unknown>();
       for (const set of sets) {
         const uniqueInSet = new Set(set);
         for (const item of uniqueInSet) {
           setCounts.set(item, (setCounts.get(item) ?? 0) + 1);
-          allItems.add(item);
         }
       }
       // Items in exactly one set, preserving first-seen order
@@ -647,9 +645,9 @@ export default {
         case 'days': return Math.floor(diffMs / 86400000);
         case 'weeks': return Math.floor(diffMs / 604800000);
         case 'months':
-          return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+          return (d2.getUTCFullYear() - d1.getUTCFullYear()) * 12 + (d2.getUTCMonth() - d1.getUTCMonth());
         case 'years':
-          return d2.getFullYear() - d1.getFullYear();
+          return d2.getUTCFullYear() - d1.getUTCFullYear();
         default:
           throw new FunctionError(`Unknown date unit: "${u}". Supported: milliseconds, seconds, minutes, hours, days, weeks, months, years`);
       }

@@ -480,6 +480,14 @@ describe('apoc-commons extension', () => {
       const fn = registry.functions.get('date.diff')!;
       expect(() => fn(['2024-01-01', '2024-01-08', 'invalid'])).toThrow();
     });
+
+    it('date.diff uses UTC for months/years', () => {
+      const fn = registry.functions.get('date.diff')!;
+      const d1 = '2023-12-15T00:00:00Z';
+      const d2 = '2024-01-15T00:00:00Z';
+      expect(fn([d1, d2, 'months'])).toBe(1);
+      expect(fn([d1, d2, 'years'])).toBe(1);
+    });
   });
 
   // ─── util.* ──────────────────────────────────────────────────
