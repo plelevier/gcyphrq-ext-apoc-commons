@@ -486,13 +486,18 @@ describe('apoc-commons extension', () => {
       expect(fn([d, 'yyyy-MM-dd HH:mm:ss.SSS'])).toBe('2024-01-15 10:30:45.123');
     });
 
-    it('date.format handles AM/PM token without matching literal text', () => {
+    it('date.format handles AM/PM token and literal text correctly', () => {
       const fn = registry.functions.get('date.format')!;
       const d = new Date('2024-01-15T10:30:00.000Z');
       expect(fn([d, 'yyyy-MM-dd a'])).toBe('2024-01-15 AM');
       expect(fn([d, 'a yyyy-MM-dd'])).toBe('AM 2024-01-15');
-      // The 'a' in 'at' should NOT be replaced
+      // Token letters inside words are NOT replaced (word-boundary check)
       expect(fn([d, 'yyyy-MM-dd at HH:mm'])).toBe('2024-01-15 at 10:30');
+      // Literal text between tokens is preserved
+      expect(fn([d, 'yyyy-MM-dd | HH:mm | a'])).toBe('2024-01-15 | 10:30 | AM');
+      // Token letters inside literal words are NOT replaced
+      expect(fn([d, 'common-MM-yyyy'])).toBe('common-01-2024');
+      expect(fn([d, 'seconds-ss-end'])).toBe('seconds-00-end');
     });
 
     it('date.format accepts timestamp', () => {

@@ -663,19 +663,48 @@ export default {
       const h12 = String(hour12).padStart(2, '0');
       const ampm = d.getUTCHours() >= 12 ? 'PM' : 'AM';
 
-      return fmt
-        .replace('yyyy', Y)
-        .replace('yy', Y.slice(-2))
-        .replace('MM', M)
-        .replace('dd', D)
-        .replace('HH', H)
-        .replace('mm', m)
-        .replace('ss', s)
-        .replace('SSS', ms)
-        .replace('SS', ms.slice(0, 2))
-        .replace('S', ms.slice(0, 1))
-        .replace(/\ba\b/g, ampm)
-        .replace('hh', h12);
+      // Token-based replacement with word-boundary checks
+      // (like Java SimpleDateFormat: tokens only match when not surrounded by word chars)
+      const FORMAT_TOKENS: readonly { pat: string; value: string }[] = [
+        { pat: 'yyyy', value: Y },
+        { pat: 'yy', value: Y.slice(-2) },
+        { pat: 'MM', value: M },
+        { pat: 'dd', value: D },
+        { pat: 'HH', value: H },
+        { pat: 'hh', value: h12 },
+        { pat: 'mm', value: m },
+        { pat: 'ss', value: s },
+        { pat: 'SSS', value: ms },
+        { pat: 'SS', value: ms.slice(0, 2) },
+        { pat: 'S', value: ms.slice(0, 1) },
+        { pat: 'a', value: ampm },
+      ];
+
+      const isWordChar = (c: string) => /[a-zA-Z0-9_]/.test(c);
+
+      let result = '';
+      let i = 0;
+      while (i < fmt.length) {
+        let matched = false;
+        for (const tok of FORMAT_TOKENS) {
+          if (fmt.startsWith(tok.pat, i)) {
+            // Only match if not surrounded by word characters
+            const beforeOk = i === 0 || !isWordChar(fmt[i - 1]);
+            const afterOk = i + tok.pat.length >= fmt.length || !isWordChar(fmt[i + tok.pat.length]);
+            if (beforeOk && afterOk) {
+              result += tok.value;
+              i += tok.pat.length;
+              matched = true;
+              break;
+            }
+          }
+        }
+        if (!matched) {
+          result += fmt[i];
+          i++;
+        }
+      }
+      return result;
     });
 
     registry.addFunction('date.now', () => {
