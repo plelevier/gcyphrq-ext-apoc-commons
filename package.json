@@ -1,0 +1,45 @@
+{
+  "name": "gcyphrq-ext-apoc-commons",
+  "version": "0.1.0",
+  "description": "Common APOC utility functions for gcyphrq (text, collection, map, math, date)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "gcyphrq": ">=0.61.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.9"
+  },
+  "keywords": [
+    "gcyphrq",
+    "gcyphrq-extension",
+    "apoc",
+    "cypher",
+    "graph"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plelevier/gcyphrq-ext-apoc-commons"
+  },
+  "gcyphrqExtensions": {
+    "apoc-commons": {
+      "type": "function",
+      "namespace": "apoc",
+      "description": "Common APOC utility functions (text, collection, map, math, date)",
+      "entryPoint": "./dist/index.js"
+    }
+  }
+}
