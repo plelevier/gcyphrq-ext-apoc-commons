@@ -54,7 +54,7 @@ export default {
       }
       const re = pattern as RegExp;
       const flags = re.flags.includes('g') ? re.flags : re.flags + 'g';
-      return s.replace(new RegExp(re, flags), repl);
+      return s.replace(new RegExp(re.source, flags), repl);
     });
 
     registry.addFunction('text.substring', (args) => {
@@ -132,10 +132,10 @@ export default {
     registry.addFunction('coll.sort', (args) => {
       if (args.length === 0) return [];
       const list = args[0];
-      if (isArray(list)) {
-        return [...list].sort();
-      }
-      return [...args].sort();
+      const values = isArray(list) ? [...(list as unknown[])] : [...args];
+      // Use numeric comparison when all elements are numbers, otherwise lexicographic
+      const allNumbers = values.every((v) => typeof v === 'number');
+      return values.sort(allNumbers ? (a, b) => (a as number) - (b as number) : (a, b) => String(a).localeCompare(String(b)));
     });
 
     registry.addFunction('coll.reverse', (args) => {
@@ -197,18 +197,23 @@ export default {
       if (args.length < 2) return [];
       const sets = args.filter(isArray) as unknown[][];
       if (sets.length < 2) return [];
-      // Items in exactly one of the sets
-      const all = sets.flat();
-      const counts = new Map<unknown, number>();
-      for (const item of all) {
-        counts.set(item, (counts.get(item) ?? 0) + 1);
+      // Count how many sets contain each item (not total occurrences)
+      const setCounts = new Map<unknown, number>();
+      const allItems = new Set<unknown>();
+      for (const set of sets) {
+        const uniqueInSet = new Set(set);
+        for (const item of uniqueInSet) {
+          setCounts.set(item, (setCounts.get(item) ?? 0) + 1);
+          allItems.add(item);
+        }
       }
-      // Deduplicate the result while preserving order
+      // Items in exactly one set, preserving first-seen order
+      const all = sets.flat();
       const seen = new Set<unknown>();
       return all.filter((item) => {
         if (seen.has(item)) return false;
         seen.add(item);
-        return (counts.get(item) ?? 0) === 1;
+        return (setCounts.get(item) ?? 0) === 1;
       });
     });
 

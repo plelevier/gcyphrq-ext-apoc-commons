@@ -47,6 +47,14 @@ describe('apoc-commons extension', () => {
       expect(fn(['a b c', ' ', '-'])).toBe('a-b-c');
     });
 
+    it('text.replaceAll works with RegExp pattern', () => {
+      const fn = registry.functions.get('text.replaceAll')!;
+      expect(fn(['hello world', /o/g, '0'])).toBe('hell0 w0rld');
+      // Without 'g' flag, should still replace all (auto-adds g)
+      expect(fn(['hello world', /o/, '0'])).toBe('hell0 w0rld');
+      expect(fn(['ABCabc', /[a-z]/g, 'X'])).toBe('ABCXXX');
+    });
+
     it('text.substring extracts substring', () => {
       const fn = registry.functions.get('text.substring')!;
       expect(fn(['hello world', 6])).toBe('world');
@@ -107,6 +115,11 @@ describe('apoc-commons extension', () => {
       expect(fn([3, 1, 2])).toEqual([1, 2, 3]);
     });
 
+    it('coll.sort uses numeric comparison for numbers', () => {
+      const fn = registry.functions.get('coll.sort')!;
+      expect(fn([[10, 2, 1, 100, 20]])).toEqual([1, 2, 10, 20, 100]);
+    });
+
     it('coll.reverse reverses a list', () => {
       const fn = registry.functions.get('coll.reverse')!;
       expect(fn([[1, 2, 3]])).toEqual([3, 2, 1]);
@@ -155,6 +168,16 @@ describe('apoc-commons extension', () => {
     it('coll.disjunction returns items in exactly one list', () => {
       const fn = registry.functions.get('coll.disjunction')!;
       expect(fn([[1, 2], [2, 3]])).toEqual([1, 3]);
+    });
+
+    it('coll.disjunction handles duplicates within a single set', () => {
+      const fn = registry.functions.get('coll.disjunction')!;
+      // '2' appears twice in first set but only in 1 set total → should be excluded (in both)
+      // '1' appears in only first set → included
+      // '3' appears in only second set → included
+      expect(fn([[1, 2, 2], [2, 3]])).toEqual([1, 3]);
+      // Item in only one set even with duplicates
+      expect(fn([[1, 1, 1], [2]])).toEqual([1, 2]);
     });
 
     it('coll.size returns the size of a collection', () => {
