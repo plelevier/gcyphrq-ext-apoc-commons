@@ -445,6 +445,15 @@ describe('apoc-commons extension', () => {
       expect(fn([d, 'MM/dd/yyyy'])).toBe('01/15/2024');
     });
 
+    it('date.format handles AM/PM token without matching literal text', () => {
+      const fn = registry.functions.get('date.format')!;
+      const d = new Date('2024-01-15T10:30:00.000Z');
+      expect(fn([d, 'yyyy-MM-dd a'])).toBe('2024-01-15 AM');
+      expect(fn([d, 'a yyyy-MM-dd'])).toBe('AM 2024-01-15');
+      // The 'a' in 'at' should NOT be replaced
+      expect(fn([d, 'yyyy-MM-dd at HH:mm'])).toBe('2024-01-15 at 10:30');
+    });
+
     it('date.format accepts timestamp', () => {
       const fn = registry.functions.get('date.format')!;
       const ts = new Date('2024-01-15T00:00:00Z').getTime();

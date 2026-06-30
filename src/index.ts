@@ -584,7 +584,7 @@ export default {
         .replace('mm', m)
         .replace('ss', s)
         .replace('SSS', ms)
-        .replace('a', ampm)
+        .replace(/\ba\b/g, ampm)
         .replace('hh', h12);
     });
 
