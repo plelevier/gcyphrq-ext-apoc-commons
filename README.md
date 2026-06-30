@@ -145,6 +145,135 @@ Supported date diff units: `milliseconds`, `seconds`, `minutes`, `hours`, `days`
 | `apoc.aggregation.minOrNull(values)` | Minimum or null if empty |
 | `apoc.aggregation.maxOrNull(values)` | Maximum or null if empty |
 
+## Example Queries
+
+Five ready-to-run queries demonstrating the extension with the example graphs in [`examples/`](examples/).
+
+### 1. Reader statistics — sort, average, and size
+
+Uses the [`bookstore.json`](examples/bookstore.json) graph to compute per-reader reading stats: sorted book list, average rating, and total count.
+
+```bash
+gcyphrq -g examples/bookstore.json --ext-fn apoc-commons \
+  -e '
+    MATCH (r:Reader)-[:READ]->(b:Book)
+    WITH r, collect(b.title) AS books, collect(b.rating) AS ratings
+    RETURN apoc.text.capitalize(r.name) AS reader,
+           apoc.coll.sort(books) AS booksRead,
+           apoc.coll.avg(ratings) AS avgRating,
+           apoc.coll.size(books) AS totalBooks
+    ORDER BY totalBooks DESC
+  '
+```
+
+**Output:**
+
+| reader | booksRead | avgRating | totalBooks |
+|--------|-----------|-----------|------------|
+| Alice | ["1984", "Foundation", "Pride and Prejudice"] | 4.6 | 3 |
+| Bob | ["1984", "Animal Farm", "Murder on the Orient Express"] | 4.47 | 3 |
+| Charlie | ["Emma", "Murder on the Orient Express", "Pride and Prejudice"] | 4.33 | 3 |
+
+### 2. Customer lifetime value — sum, average, and rounding
+
+Uses the [`ecommerce.json`](examples/ecommerce.json) graph to compute each customer's lifetime spend and average order value.
+
+```bash
+gcyphrq -g examples/ecommerce.json --ext-fn apoc-commons \
+  -e '
+    MATCH (c:Customer)-[:PLACED]->(o:Order)
+    WITH c, collect(o) AS orders, collect(o.total) AS totals
+    RETURN apoc.text.capitalize(c.name) AS customer,
+           apoc.coll.size(orders) AS orderCount,
+           apoc.coll.sum(totals) AS lifetimeSpend,
+           apoc.math.round(apoc.coll.avg(totals), 2) AS avgOrder,
+           c.tier AS tier
+    ORDER BY lifetimeSpend DESC
+  '
+```
+
+**Output:**
+
+| customer | orderCount | lifetimeSpend | avgOrder | tier |
+|----------|-----------|---------------|----------|------|
+| Alice Johnson | 2 | 2779.96 | 1389.98 | gold |
+| Diana Lee | 1 | 1449.98 | 1449.98 | gold |
+| Bob Smith | 2 | 728.97 | 364.49 | silver |
+| Charlie Davis | 1 | 449.98 | 449.98 | bronze |
+
+### 3. Tag cloud per book — split, uppercase, and filtering
+
+Uses the [`bookstore.json`](examples/bookstore.json) graph to extract and display tags for highly-rated books.
+
+```bash
+gcyphrq -g examples/bookstore.json --ext-fn apoc-commons \
+  -e '
+    MATCH (b:Book)
+    WHERE b.rating >= 4.5
+    RETURN apoc.text.toUpperCase(b.title) AS title,
+           apoc.text.split(b.tags, ",") AS tags,
+           b.rating
+    ORDER BY b.rating DESC
+  '
+```
+
+**Output:**
+
+| title | tags | rating |
+|-------|------|--------|
+| 1984 | ["dystopian", "classic", "political"] | 4.7 |
+| FOUNDATION | ["science fiction", "space", "classic"] | 4.6 |
+| PRIDE AND PREJUDICE | ["romance", "classic", "english"] | 4.5 |
+
+### 4. Order date formatting — parse, format, and clamp
+
+Uses the [`ecommerce.json`](examples/ecommerce.json) graph to parse ISO timestamps, format them as dates, and clamp stock levels.
+
+```bash
+gcyphrq -g examples/ecommerce.json --ext-fn apoc-commons \
+  -e '
+    MATCH (o:Order)-[:CONTAINS]->(p:Product)
+    RETURN o.id AS orderId,
+           apoc.date.format(apoc.date.parse(o.date), "yyyy-MM-dd") AS orderDate,
+           p.name AS product,
+           apoc.math.clamp(p.stock, 0, 100) AS stockLevel
+    ORDER BY o.date, p.name
+  '
+```
+
+**Output:**
+
+| orderId | orderDate | product | stockLevel |
+|---------|-----------|---------|------------|
+| ORD-001 | 2024-01-15 | Laptop Pro | 50 |
+| ORD-001 | 2024-01-15 | Wireless Mouse | 100 |
+| ORD-002 | 2024-02-20 | Standing Desk | 30 |
+| ORD-002 | 2024-02-20 | USB-C Hub | 100 |
+| ... | ... | ... | ... |
+
+### 5. Contact info with coalesce — type checking and fallbacks
+
+Uses the [`bookstore.json`](examples/bookstore.json) graph to safely handle missing properties with `coalesce` and type guards.
+
+```bash
+gcyphrq -g examples/bookstore.json --ext-fn apoc-commons \
+  -e '
+    MATCH (r:Reader)
+    RETURN apoc.text.capitalize(r.name) AS name,
+           apoc.util.coalesce(r.email, "No email on file") AS contact,
+           apoc.util.toBoolean(apoc.util.isString(r.email)) AS hasEmail,
+           apoc.util.isMap(r) AS isNode
+  '
+```
+
+**Output:**
+
+| name | contact | hasEmail | isNode |
+|------|---------|----------|--------|
+| Alice | alice@reads.com | true | true |
+| Bob | bob@reads.com | true | true |
+| Charlie | charlie@reads.com | true | true |
+
 ## License
 
 MIT

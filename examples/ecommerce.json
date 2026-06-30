@@ -1,0 +1,37 @@
+{
+  "nodes": [
+    { "key": "cust-1", "attributes": { "label": "Customer", "name": "Alice Johnson", "tier": "gold", "joined": "2022-03-15", "email": "alice@shop.com" } },
+    { "key": "cust-2", "attributes": { "label": "Customer", "name": "Bob Smith", "tier": "silver", "joined": "2023-01-20", "email": "bob@shop.com" } },
+    { "key": "cust-3", "attributes": { "label": "Customer", "name": "Charlie Davis", "tier": "bronze", "joined": "2023-06-10", "email": "charlie@shop.com" } },
+    { "key": "cust-4", "attributes": { "label": "Customer", "name": "Diana Lee", "tier": "gold", "joined": "2021-11-01", "email": "diana@shop.com" } },
+    { "key": "prod-1", "attributes": { "label": "Product", "name": "Laptop Pro", "category": "Electronics", "price": 1299.99, "stock": 50 } },
+    { "key": "prod-2", "attributes": { "label": "Product", "name": "Wireless Mouse", "category": "Electronics", "price": 29.99, "stock": 200 } },
+    { "key": "prod-3", "attributes": { "label": "Product", "name": "Standing Desk", "category": "Furniture", "price": 499.00, "stock": 30 } },
+    { "key": "prod-4", "attributes": { "label": "Product", "name": "USB-C Hub", "category": "Electronics", "price": 49.99, "stock": 150 } },
+    { "key": "prod-5", "attributes": { "label": "Product", "name": "Ergonomic Chair", "category": "Furniture", "price": 399.00, "stock": 25 } },
+    { "key": "prod-6", "attributes": { "label": "Product", "name": "Mechanical Keyboard", "category": "Electronics", "price": 149.99, "stock": 80 } },
+    { "key": "order-1", "attributes": { "label": "Order", "id": "ORD-001", "date": "2024-01-15T10:30:00Z", "status": "delivered", "total": 1329.98 } },
+    { "key": "order-2", "attributes": { "label": "Order", "id": "ORD-002", "date": "2024-02-20T14:00:00Z", "status": "delivered", "total": 548.99 } },
+    { "key": "order-3", "attributes": { "label": "Order", "id": "ORD-003", "date": "2024-03-05T09:15:00Z", "status": "shipped", "total": 1449.98 } },
+    { "key": "order-4", "attributes": { "label": "Order", "id": "ORD-004", "date": "2024-03-10T16:45:00Z", "status": "pending", "total": 449.98 } },
+    { "key": "order-5", "attributes": { "label": "Order", "id": "ORD-005", "date": "2024-04-01T11:00:00Z", "status": "delivered", "total": 179.98 } }
+  ],
+  "edges": [
+    { "source": "cust-1", "target": "order-1", "attributes": { "type": "PLACED" } },
+    { "source": "cust-1", "target": "order-3", "attributes": { "type": "PLACED" } },
+    { "source": "cust-2", "target": "order-2", "attributes": { "type": "PLACED" } },
+    { "source": "cust-2", "target": "order-5", "attributes": { "type": "PLACED" } },
+    { "source": "cust-3", "target": "order-4", "attributes": { "type": "PLACED" } },
+    { "source": "cust-4", "target": "order-3", "attributes": { "type": "PLACED" } },
+    { "source": "order-1", "target": "prod-1", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-1", "target": "prod-2", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-2", "target": "prod-3", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-2", "target": "prod-4", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-3", "target": "prod-1", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-3", "target": "prod-6", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-4", "target": "prod-5", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-4", "target": "prod-2", "attributes": { "type": "CONTAINS", "quantity": 1 } },
+    { "source": "order-5", "target": "prod-4", "attributes": { "type": "CONTAINS", "quantity": 2 } },
+    { "source": "order-5", "target": "prod-2", "attributes": { "type": "CONTAINS", "quantity": 1 } }
+  ]
+}
