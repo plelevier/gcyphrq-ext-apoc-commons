@@ -241,7 +241,7 @@ export default {
     registry.addFunction('coll.flatten', (args) => {
       if (args.length === 0) return [];
       const list = args[0];
-      if (!isArray(list)) return args;
+      if (!isArray(list)) return [...args].flat(Infinity);
       return (list as unknown[]).flat(Infinity);
     });
 
@@ -260,7 +260,7 @@ export default {
     registry.addFunction('coll.union', (args) => {
       if (args.length === 0) return [];
       const sets = args.filter(isArray) as unknown[][];
-      if (sets.length === 0) return args;
+      if (sets.length === 0) return [...args];
       return [...new Set(sets.flat())];
     });
 
