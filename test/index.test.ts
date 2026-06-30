@@ -344,6 +344,11 @@ describe('apoc-commons extension', () => {
       expect(r2).toBeLessThanOrEqual(10);
     });
 
+    it('math.random throws when min > max', () => {
+      const fn = registry.functions.get('math.random')!;
+      expect(() => fn([10, 5])).toThrow();
+    });
+
     it('math.abs returns absolute value', () => {
       const fn = registry.functions.get('math.abs')!;
       expect(fn([-5])).toBe(5);
@@ -437,12 +442,48 @@ describe('apoc-commons extension', () => {
       expect(() => fn(['not-a-date'])).toThrow();
     });
 
+    it('date.parse uses format argument to parse custom date strings', () => {
+      const fn = registry.functions.get('date.parse')!;
+      let result = fn(['2024-01-15', 'yyyy-MM-dd']);
+      expect(result).toBeInstanceOf(Date);
+      expect((result as Date).getUTCFullYear()).toBe(2024);
+      expect((result as Date).getUTCMonth()).toBe(0);
+      expect((result as Date).getUTCDate()).toBe(15);
+
+      result = fn(['15/01/2024 10:30:45', 'dd/MM/yyyy HH:mm:ss']);
+      expect((result as Date).getUTCDate()).toBe(15);
+      expect((result as Date).getUTCHours()).toBe(10);
+      expect((result as Date).getUTCMinutes()).toBe(30);
+      expect((result as Date).getUTCSeconds()).toBe(45);
+
+      // 12-hour clock with AM
+      result = fn(['01/15/2024 02:30 AM', 'MM/dd/yyyy hh:mm a']);
+      expect((result as Date).getUTCHours()).toBe(2);
+
+      // 12-hour clock with PM
+      result = fn(['01/15/2024 02:30 PM', 'MM/dd/yyyy hh:mm a']);
+      expect((result as Date).getUTCHours()).toBe(14);
+
+      // Two-digit year
+      result = fn(['24-01-15', 'yy-MM-dd']);
+      expect((result as Date).getUTCFullYear()).toBe(2024);
+    });
+
     it('date.format formats a date', () => {
       const fn = registry.functions.get('date.format')!;
       const d = new Date('2024-01-15T10:30:45.123Z');
       expect(fn([d, 'yyyy-MM-dd'])).toBe('2024-01-15');
       expect(fn([d, 'yyyy-MM-dd HH:mm:ss'])).toBe('2024-01-15 10:30:45');
       expect(fn([d, 'MM/dd/yyyy'])).toBe('01/15/2024');
+    });
+
+    it('date.format supports SS and S millisecond variants', () => {
+      const fn = registry.functions.get('date.format')!;
+      const d = new Date('2024-01-15T10:30:45.123Z');
+      expect(fn([d, 'SSS'])).toBe('123');
+      expect(fn([d, 'SS'])).toBe('12');
+      expect(fn([d, 'S'])).toBe('1');
+      expect(fn([d, 'yyyy-MM-dd HH:mm:ss.SSS'])).toBe('2024-01-15 10:30:45.123');
     });
 
     it('date.format handles AM/PM token without matching literal text', () => {
