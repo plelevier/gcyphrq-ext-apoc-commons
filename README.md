@@ -100,7 +100,7 @@ const results = await executeQuery(graphData, 'RETURN apoc.text.capitalize("hell
 | `apoc.math.ceil(value)` | Ceiling | `apoc.math.ceil(3.2)` → `4` |
 | `apoc.math.pow(base, exponent)` | Power | `apoc.math.pow(2, 10)` → `1024` |
 | `apoc.math.sqrt(value)` | Square root | `apoc.math.sqrt(16)` → `4` |
-| `apoc.math.log(value)` | Natural logarithm | `apoc.math.log(e)` → `1` |
+| `apoc.math.log(value)` | Natural logarithm | `apoc.math.log(apoc.math.e())` → `1` |
 | `apoc.math.log10(value)` | Base-10 logarithm | `apoc.math.log10(100)` → `2` |
 | `apoc.math.exp(value)` | e^x | `apoc.math.exp(1)` → `2.718...` |
 | `apoc.math.min(values...)` | Minimum of values | `apoc.math.min(3, 1, 2)` → `1` |
@@ -160,9 +160,8 @@ gcyphrq -g examples/bookstore.json --ext-fn apoc-commons \
     WITH r, collect(b.title) AS books, collect(b.rating) AS ratings
     RETURN apoc.text.capitalize(r.name) AS reader,
            apoc.coll.sort(books) AS booksRead,
-           apoc.coll.avg(ratings) AS avgRating,
+           apoc.math.round(apoc.coll.avg(ratings), 2) AS avgRating,
            apoc.coll.size(books) AS totalBooks
-    ORDER BY totalBooks DESC
   '
 ```
 
@@ -188,7 +187,6 @@ gcyphrq -g examples/ecommerce.json --ext-fn apoc-commons \
            apoc.coll.sum(totals) AS lifetimeSpend,
            apoc.math.round(apoc.coll.avg(totals), 2) AS avgOrder,
            c.tier AS tier
-    ORDER BY lifetimeSpend DESC
   '
 ```
 
@@ -197,9 +195,9 @@ gcyphrq -g examples/ecommerce.json --ext-fn apoc-commons \
 | customer | orderCount | lifetimeSpend | avgOrder | tier |
 |----------|-----------|---------------|----------|------|
 | Alice Johnson | 2 | 2779.96 | 1389.98 | gold |
-| Diana Lee | 1 | 1449.98 | 1449.98 | gold |
 | Bob Smith | 2 | 728.97 | 364.49 | silver |
 | Charlie Davis | 1 | 449.98 | 449.98 | bronze |
+| Diana Lee | 1 | 1449.98 | 1449.98 | gold |
 
 ### 3. Tag cloud per book — split, uppercase, and filtering
 
@@ -249,7 +247,12 @@ gcyphrq -g examples/ecommerce.json --ext-fn apoc-commons \
 | ORD-001 | 2024-01-15 | Wireless Mouse | 100 |
 | ORD-002 | 2024-02-20 | Standing Desk | 30 |
 | ORD-002 | 2024-02-20 | USB-C Hub | 100 |
-| ... | ... | ... | ... |
+| ORD-003 | 2024-03-05 | Laptop Pro | 50 |
+| ORD-003 | 2024-03-05 | Mechanical Keyboard | 80 |
+| ORD-004 | 2024-03-10 | Ergonomic Chair | 25 |
+| ORD-004 | 2024-03-10 | Wireless Mouse | 100 |
+| ORD-005 | 2024-04-01 | USB-C Hub | 100 |
+| ORD-005 | 2024-04-01 | Wireless Mouse | 100 |
 
 ### 5. Contact info with coalesce — type checking and fallbacks
 
