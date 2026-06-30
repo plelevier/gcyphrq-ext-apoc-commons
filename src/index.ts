@@ -25,6 +25,8 @@ function parseDateWithFormat(str: string, fmt: string): Date {
     { pat: 'a', regex: '(AM|PM)', field: 'ampm' },
   ];
 
+  const isWordChar = (c: string) => /[a-zA-Z0-9_]/.test(c);
+
   // Walk the format string to build regex and ordered field list
   let regex = '';
   const fields: string[] = [];
@@ -33,11 +35,16 @@ function parseDateWithFormat(str: string, fmt: string): Date {
     let matched = false;
     for (const tok of TOKENS) {
       if (fmt.startsWith(tok.pat, i)) {
-        regex += tok.regex;
-        fields.push(tok.field);
-        i += tok.pat.length;
-        matched = true;
-        break;
+        // Only match if not surrounded by word characters
+        const beforeOk = i === 0 || !isWordChar(fmt[i - 1]);
+        const afterOk = i + tok.pat.length >= fmt.length || !isWordChar(fmt[i + tok.pat.length]);
+        if (beforeOk && afterOk) {
+          regex += tok.regex;
+          fields.push(tok.field);
+          i += tok.pat.length;
+          matched = true;
+          break;
+        }
       }
     }
     if (!matched) {
@@ -819,7 +826,7 @@ export default {
     registry.addFunction('util.toInteger', (args) => {
       if (args.length === 0) return 0;
       const val = args[0];
-      if (isNumber(val)) return Math.floor(val as number);
+      if (isNumber(val)) return Math.trunc(val as number);
       if (isString(val)) {
         const parsed = parseInt(val as string, 10);
         return isNaN(parsed) ? 0 : parsed;

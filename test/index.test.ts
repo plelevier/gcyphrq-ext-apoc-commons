@@ -469,6 +469,14 @@ describe('apoc-commons extension', () => {
       expect((result as Date).getUTCFullYear()).toBe(2024);
     });
 
+    it('date.parse ignores token patterns inside literal text (word boundaries)', () => {
+      const fn = registry.functions.get('date.parse')!;
+      // 'mm' inside 'common' is literal, not a token
+      const result = fn(['common-01-2024', 'common-MM-yyyy']);
+      expect((result as Date).getUTCMonth()).toBe(0);
+      expect((result as Date).getUTCFullYear()).toBe(2024);
+    });
+
     it('date.format formats a date', () => {
       const fn = registry.functions.get('date.format')!;
       const d = new Date('2024-01-15T10:30:45.123Z');
@@ -600,7 +608,11 @@ describe('apoc-commons extension', () => {
       const fn = registry.functions.get('util.toInteger')!;
       expect(fn(['42'])).toBe(42);
       expect(fn([3.7])).toBe(3);
+      expect(fn([3.9])).toBe(3);
       expect(fn(['not-a-number'])).toBe(0);
+      // truncates toward zero for negatives (consistent with parseInt behavior)
+      expect(fn([-3.7])).toBe(-3);
+      expect(fn([-3.9])).toBe(-3);
     });
 
     it('util.toFloat converts value to float', () => {
